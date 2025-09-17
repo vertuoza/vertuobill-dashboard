@@ -1,69 +1,278 @@
 import mysql from 'mysql2/promise';
 import { Client } from '@dashboard/shared';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+
+const execAsync = promisify(exec);
 
 export class DatabaseService {
   private pool: mysql.Pool | null = null;
   private pool2: mysql.Pool | null = null;
 
-  async connect() {
+  // Test de connectivité réseau
+  private async testNetworkConnectivity(host: string, port: number): Promise<boolean> {
     try {
-      // Connexion à la base principale avec timeout réduit
-      this.pool = mysql.createPool({
+      console.log(`🌐 Test de connectivité réseau vers ${host}:${port}...`);
+      
+      // Test de ping (si possible)
+      try {
+        const { stdout } = await execAsync(`ping -c 1 -W 3 ${host}`);
+        console.log(`📡 Ping vers ${host}: OK`);
+      } catch (pingError) {
+        console.warn(`⚠️ Ping vers ${host} échoué (normal dans certains environnements)`);
+      }
+
+      // Test de connectivité TCP avec timeout
+      const net = require('net');
+      return new Promise((resolve) => {
+        const socket = new net.Socket();
+        const timeout = 5000;
+
+        socket.setTimeout(timeout);
+        
+        socket.on('connect', () => {
+          console.log(`✅ Connectivité TCP vers ${host}:${port} - OK`);
+          socket.destroy();
+          resolve(true);
+        });
+
+        socket.on('timeout', () => {
+          console.error(`❌ Timeout TCP vers ${host}:${port} après ${timeout}ms`);
+          socket.destroy();
+          resolve(false);
+        });
+
+        socket.on('error', (err: any) => {
+          console.error(`❌ Erreur TCP vers ${host}:${port}:`, err.message);
+          socket.destroy();
+          resolve(false);
+        });
+
+        socket.connect(port, host);
+      });
+    } catch (error) {
+      console.error(`❌ Erreur lors du test de connectivité vers ${host}:${port}:`, error);
+      return false;
+    }
+  }
+
+  // Logs détaillés de configuration
+  private logDatabaseConfig() {
+    console.log('🔍 CONFIGURATION BASE DE DONNÉES:');
+    console.log('📋 Base principale:');
+    console.log(`   - Host: ${process.env.DB_HOST || 'localhost'}`);
+    console.log(`   - Port: ${process.env.DB_PORT || '3306'}`);
+    console.log(`   - Database: ${process.env.DB_NAME || 'dashboard'}`);
+    console.log(`   - User: ${process.env.DB_USER || 'root'}`);
+    console.log(`   - Password: ${process.env.DB_PASSWORD ? '***SET***' : '***NOT SET***'}`);
+    
+    console.log('📋 Base secondaire:');
+    console.log(`   - Host: ${process.env.DB2_HOST || 'localhost'}`);
+    console.log(`   - Port: ${process.env.DB2_PORT || '3306'}`);
+    console.log(`   - Database: ${process.env.DB2_NAME || 'legal_unit_db'}`);
+    console.log(`   - User: ${process.env.DB2_USER || 'root'}`);
+    console.log(`   - Password: ${process.env.DB2_PASSWORD ? '***SET***' : '***NOT SET***'}`);
+  }
+
+  async connect() {
+    const startTime = Date.now();
+    console.log('🚀 DÉBUT DE LA CONNEXION AUX BASES DE DONNÉES');
+    console.log(`⏰ Timestamp: ${new Date().toISOString()}`);
+    
+    // Afficher la configuration
+    this.logDatabaseConfig();
+
+    try {
+      // Variables de configuration
+      const db1Config = {
         host: process.env.DB_HOST || 'localhost',
         user: process.env.DB_USER || 'root',
         password: process.env.DB_PASSWORD || '',
         database: process.env.DB_NAME || 'dashboard',
-        port: parseInt(process.env.DB_PORT || '3306'),
-        connectionLimit: 10,
-        idleTimeout: 60000, // Réduit à 1 minute
-        maxIdle: 10
-      });
-      
-      // Connexion à la base secondaire (legal_unit) avec timeout réduit
-      this.pool2 = mysql.createPool({
+        port: parseInt(process.env.DB_PORT || '3306')
+      };
+
+      const db2Config = {
         host: process.env.DB2_HOST || 'localhost',
         user: process.env.DB2_USER || 'root',
         password: process.env.DB2_PASSWORD || '',
         database: process.env.DB2_NAME || 'legal_unit_db',
-        port: parseInt(process.env.DB2_PORT || '3306'),
+        port: parseInt(process.env.DB2_PORT || '3306')
+      };
+
+      // Test de connectivité réseau AVANT les connexions MySQL
+      console.log('🌐 PHASE 1: Tests de connectivité réseau');
+      const db1NetworkOk = await this.testNetworkConnectivity(db1Config.host, db1Config.port);
+      const db2NetworkOk = await this.testNetworkConnectivity(db2Config.host, db2Config.port);
+
+      if (!db1NetworkOk) {
+        throw new Error(`Connectivité réseau échouée vers DB1: ${db1Config.host}:${db1Config.port}`);
+      }
+      if (!db2NetworkOk) {
+        throw new Error(`Connectivité réseau échouée vers DB2: ${db2Config.host}:${db2Config.port}`);
+      }
+
+      console.log('🔗 PHASE 2: Création des pools de connexions MySQL');
+      
+      // Connexion à la base principale avec logs détaillés
+      console.log('🔄 Création du pool pour la base principale...');
+      this.pool = mysql.createPool({
+        ...db1Config,
+        connectionLimit: 10,
+        idleTimeout: 60000,
+        maxIdle: 10
+      });
+      
+      // Connexion à la base secondaire avec logs détaillés
+      console.log('🔄 Création du pool pour la base secondaire...');
+      this.pool2 = mysql.createPool({
+        ...db2Config,
         connectionLimit: 5,
-        idleTimeout: 60000, // Réduit à 1 minute
+        idleTimeout: 60000,
         maxIdle: 5
       });
       
-      // Test des connexions avec timeout
+      console.log('🧪 PHASE 3: Tests de connexion MySQL');
+      
+      // Test de la connexion principale avec logs détaillés
       console.log('🔄 Test de connexion à la base de données principale...');
-      const connection1 = await Promise.race([
-        this.pool.getConnection(),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout connexion DB1')), 5000))
-      ]) as mysql.PoolConnection;
-      await connection1.ping();
-      connection1.release();
+      const db1TestStart = Date.now();
+      try {
+        const connection1 = await Promise.race([
+          this.pool.getConnection(),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout connexion DB1 après 10s')), 10000))
+        ]) as mysql.PoolConnection;
+        
+        const db1ConnectTime = Date.now() - db1TestStart;
+        console.log(`⚡ Connexion DB1 obtenue en ${db1ConnectTime}ms`);
+        
+        await connection1.ping();
+        console.log('🏓 Ping DB1 réussi');
+        
+        connection1.release();
+        console.log('✅ Connexion DB1 libérée');
+      } catch (db1Error: any) {
+        const db1ConnectTime = Date.now() - db1TestStart;
+        console.error(`❌ Erreur DB1 après ${db1ConnectTime}ms:`, db1Error);
+        throw new Error(`DB1 Connection Failed: ${db1Error?.message || db1Error}`);
+      }
       
+      // Test de la connexion secondaire avec logs détaillés
       console.log('🔄 Test de connexion à la base de données secondaire...');
-      const connection2 = await Promise.race([
-        this.pool2.getConnection(),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout connexion DB2')), 5000))
-      ]) as mysql.PoolConnection;
-      await connection2.ping();
-      connection2.release();
+      const db2TestStart = Date.now();
+      try {
+        const connection2 = await Promise.race([
+          this.pool2.getConnection(),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout connexion DB2 après 10s')), 10000))
+        ]) as mysql.PoolConnection;
+        
+        const db2ConnectTime = Date.now() - db2TestStart;
+        console.log(`⚡ Connexion DB2 obtenue en ${db2ConnectTime}ms`);
+        
+        await connection2.ping();
+        console.log('🏓 Ping DB2 réussi');
+        
+        connection2.release();
+        console.log('✅ Connexion DB2 libérée');
+      } catch (db2Error: any) {
+        const db2ConnectTime = Date.now() - db2TestStart;
+        console.error(`❌ Erreur DB2 après ${db2ConnectTime}ms:`, db2Error);
+        throw new Error(`DB2 Connection Failed: ${db2Error?.message || db2Error}`);
+      }
       
-      console.log('✅ Pool de connexions à la base de données principale établi');
-      console.log(`📡 Connecté à ${process.env.DB_HOST}:${process.env.DB_PORT} - DB: ${process.env.DB_NAME}`);
-      console.log('✅ Pool de connexions à la base de données secondaire établi');
-      console.log(`📡 Connecté à ${process.env.DB2_HOST}:${process.env.DB2_PORT} - DB: ${process.env.DB2_NAME}`);
-    } catch (error) {
-      console.error('❌ Erreur de connexion à la base de données:', error);
+      const totalTime = Date.now() - startTime;
+      console.log('🎉 CONNEXIONS RÉUSSIES !');
+      console.log(`✅ Pool de connexions à la base de données principale établi`);
+      console.log(`📡 Connecté à ${db1Config.host}:${db1Config.port} - DB: ${db1Config.database}`);
+      console.log(`✅ Pool de connexions à la base de données secondaire établi`);
+      console.log(`📡 Connecté à ${db2Config.host}:${db2Config.port} - DB: ${db2Config.database}`);
+      console.log(`⏱️ Temps total de connexion: ${totalTime}ms`);
+      
+    } catch (error: any) {
+      const totalTime = Date.now() - startTime;
+      console.error('💥 ÉCHEC DE LA CONNEXION AUX BASES DE DONNÉES');
+      console.error(`⏱️ Temps écoulé: ${totalTime}ms`);
+      console.error('❌ Erreur détaillée:', error);
+      console.error('📚 Stack trace:', error?.stack);
+      
+      // Informations supplémentaires sur l'erreur
+      if (error?.code) {
+        console.error(`🔍 Code d'erreur: ${error.code}`);
+      }
+      if (error?.errno) {
+        console.error(`🔍 Errno: ${error.errno}`);
+      }
+      if (error?.sqlState) {
+        console.error(`🔍 SQL State: ${error.sqlState}`);
+      }
+      
       // Nettoyer les pools en cas d'erreur
+      console.log('🧹 Nettoyage des pools de connexions...');
       if (this.pool) {
-        await this.pool.end().catch(() => {});
+        await this.pool.end().catch((endError) => {
+          console.error('❌ Erreur lors de la fermeture du pool DB1:', endError);
+        });
         this.pool = null;
       }
       if (this.pool2) {
-        await this.pool2.end().catch(() => {});
+        await this.pool2.end().catch((endError) => {
+          console.error('❌ Erreur lors de la fermeture du pool DB2:', endError);
+        });
         this.pool2 = null;
       }
+      
       throw error;
+    }
+  }
+
+  // Méthode pour obtenir l'état des connexions
+  getConnectionStatus() {
+    return {
+      db1Connected: this.pool !== null,
+      db2Connected: this.pool2 !== null,
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  // Méthode pour tester la connexion DB1
+  async testDB1Connection(): Promise<{ success: boolean; responseTime?: number; error?: string; code?: string; errno?: number }> {
+    if (!this.pool) {
+      return { success: false, error: 'Pool DB1 non initialisé' };
+    }
+
+    try {
+      const testStart = Date.now();
+      const [rows] = await this.pool.execute('SELECT 1 as test');
+      const responseTime = Date.now() - testStart;
+      return { success: true, responseTime };
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error?.message || error,
+        code: error?.code,
+        errno: error?.errno
+      };
+    }
+  }
+
+  // Méthode pour tester la connexion DB2
+  async testDB2Connection(): Promise<{ success: boolean; responseTime?: number; error?: string; code?: string; errno?: number }> {
+    if (!this.pool2) {
+      return { success: false, error: 'Pool DB2 non initialisé' };
+    }
+
+    try {
+      const testStart = Date.now();
+      const [rows] = await this.pool2.execute('SELECT 1 as test');
+      const responseTime = Date.now() - testStart;
+      return { success: true, responseTime };
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error?.message || error,
+        code: error?.code,
+        errno: error?.errno
+      };
     }
   }
 

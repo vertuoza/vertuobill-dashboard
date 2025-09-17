@@ -8,6 +8,7 @@ import path from 'path';
 import authRoutes from './routes/auth';
 import clientsRoutes from './routes/clients';
 import dashboardRoutes from './routes/dashboard';
+import diagnosticRoutes from './routes/diagnostic';
 import { dbService } from './services/database';
 
 // Load environment variables from root directory
@@ -47,6 +48,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/auth', authRoutes);
 app.use('/api/clients', clientsRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/diagnostic', diagnosticRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
