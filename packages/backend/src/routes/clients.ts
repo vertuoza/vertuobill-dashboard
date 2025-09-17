@@ -21,10 +21,14 @@ router.get('/', async (req: AuthRequest, res: Response) => {
       dateTo = ''
     } = req.query as any;
 
-    // Essayer d'utiliser la base de données, sinon fallback sur les données mockées
+    // TEMPORAIRE : Forcer l'utilisation des données mockées pour validation du déploiement
     let clients: Client[];
     let total: number;
 
+    console.log('🔄 Mode test : Utilisation forcée des données mockées');
+    
+    // COMMENTÉ TEMPORAIREMENT POUR TEST
+    /*
     try {
       const result = await dbService.getClients({
         page: Number(page),
@@ -40,18 +44,19 @@ router.get('/', async (req: AuthRequest, res: Response) => {
       console.log('✅ Données récupérées depuis la base de données');
     } catch (dbError) {
       console.warn('⚠️ Erreur DB, utilisation des données mockées:', dbError);
+    */
       
-      // Fallback sur les données mockées avec la logique existante
-      let filteredClients = mockClients;
-      
-      if (search) {
-        const searchLower = search.toLowerCase();
-        filteredClients = filteredClients.filter(client =>
-          client.societe_name.toLowerCase().includes(searchLower) ||
-          client.email?.toLowerCase().includes(searchLower) ||
-          client.phone?.includes(search)
-        );
-      }
+    // Utilisation des données mockées avec la logique existante
+    let filteredClients = mockClients;
+    
+    if (search) {
+      const searchLower = search.toLowerCase();
+      filteredClients = filteredClients.filter(client =>
+        client.societe_name.toLowerCase().includes(searchLower) ||
+        client.email?.toLowerCase().includes(searchLower) ||
+        client.phone?.includes(search)
+      );
+    }
 
       if (dateFrom || dateTo) {
         filteredClients = filteredClients.filter(client => {
@@ -93,7 +98,6 @@ router.get('/', async (req: AuthRequest, res: Response) => {
       const endIndex = startIndex + Number(limit);
       clients = filteredClients.slice(startIndex, endIndex);
       total = filteredClients.length;
-    }
 
     const response: PaginatedResponse<Client> = {
       data: clients,

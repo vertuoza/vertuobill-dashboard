@@ -119,7 +119,14 @@ const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`🏠 Frontend: http://0.0.0.0:${PORT}/`);
   console.log(`⏰ Timestamp: ${new Date().toISOString()}`);
   
+  // TEMPORAIRE : Désactivation des connexions DB pour test avec données mockées
+  console.log('🔄 Mode test : Utilisation des données mockées uniquement');
+  console.log('⚠️ Connexions aux bases de données désactivées temporairement');
+  console.log('💡 Les routes utiliseront les données mockées pour validation du déploiement');
+  
   // Tentative de connexion à la base de données en arrière-plan (non-bloquante)
+  // COMMENTÉ TEMPORAIREMENT POUR TEST
+  /*
   console.log('🔄 Tentative de connexion aux bases de données...');
   dbService.connect()
     .then(() => {
@@ -131,6 +138,7 @@ const server = app.listen(PORT, '0.0.0.0', () => {
       console.error('❌ Détails de l\'erreur DB:', error.message);
       console.error('❌ Stack trace:', error.stack);
     });
+  */
 });
 
 // Gestion des erreurs du serveur
