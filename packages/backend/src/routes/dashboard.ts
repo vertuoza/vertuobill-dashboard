@@ -11,13 +11,9 @@ router.use(authenticateToken);
 // Route pour obtenir les statistiques du dashboard
 router.get('/stats', async (req: AuthRequest, res: Response) => {
   try {
-    // TEMPORAIRE : Forcer l'utilisation des données mockées pour validation du déploiement
+    // Essayer d'utiliser la base de données, sinon fallback sur les données mockées
     let stats;
 
-    console.log('🔄 Mode test : Utilisation forcée des données mockées pour les stats');
-    
-    // COMMENTÉ TEMPORAIREMENT POUR TEST
-    /*
     try {
       const dbStats = await dbService.getDashboardStats();
       stats = {
@@ -30,16 +26,16 @@ router.get('/stats', async (req: AuthRequest, res: Response) => {
       console.log('✅ Statistiques récupérées depuis la base de données');
     } catch (dbError) {
       console.warn('⚠️ Erreur DB pour les stats, utilisation des données mockées:', dbError);
-    */
       
-    // Utilisation des données mockées
-    stats = {
-      totalClients: '20',
-      totalFactures: '2847',
-      totalContacts: '98',
-      totalEntreprises: '98',
-      totalFacturesFournisseurs: '623'
-    };
+      // Fallback sur les données mockées
+      stats = {
+        totalClients: '20',
+        totalFactures: '2847',
+        totalContacts: '98',
+        totalEntreprises: '98',
+        totalFacturesFournisseurs: '623'
+      };
+    }
 
     res.json({
       success: true,
