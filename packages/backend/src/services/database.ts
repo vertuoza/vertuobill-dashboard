@@ -7,7 +7,7 @@ export class DatabaseService {
 
   async connect() {
     try {
-      // Connexion à la base principale
+      // Connexion à la base principale avec timeout réduit
       this.pool = mysql.createPool({
         host: process.env.DB_HOST || 'localhost',
         user: process.env.DB_USER || 'root',
@@ -15,11 +15,11 @@ export class DatabaseService {
         database: process.env.DB_NAME || 'dashboard',
         port: parseInt(process.env.DB_PORT || '3306'),
         connectionLimit: 10,
-        idleTimeout: 300000,
+        idleTimeout: 60000, // Réduit à 1 minute
         maxIdle: 10
       });
       
-      // Connexion à la base secondaire (legal_unit)
+      // Connexion à la base secondaire (legal_unit) avec timeout réduit
       this.pool2 = mysql.createPool({
         host: process.env.DB2_HOST || 'localhost',
         user: process.env.DB2_USER || 'root',
@@ -27,16 +27,24 @@ export class DatabaseService {
         database: process.env.DB2_NAME || 'legal_unit_db',
         port: parseInt(process.env.DB2_PORT || '3306'),
         connectionLimit: 5,
-        idleTimeout: 300000,
+        idleTimeout: 60000, // Réduit à 1 minute
         maxIdle: 5
       });
       
-      // Test des connexions
-      const connection1 = await this.pool.getConnection();
+      // Test des connexions avec timeout
+      console.log('🔄 Test de connexion à la base de données principale...');
+      const connection1 = await Promise.race([
+        this.pool.getConnection(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout connexion DB1')), 5000))
+      ]) as mysql.PoolConnection;
       await connection1.ping();
       connection1.release();
       
-      const connection2 = await this.pool2.getConnection();
+      console.log('🔄 Test de connexion à la base de données secondaire...');
+      const connection2 = await Promise.race([
+        this.pool2.getConnection(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout connexion DB2')), 5000))
+      ]) as mysql.PoolConnection;
       await connection2.ping();
       connection2.release();
       
@@ -46,6 +54,15 @@ export class DatabaseService {
       console.log(`📡 Connecté à ${process.env.DB2_HOST}:${process.env.DB2_PORT} - DB: ${process.env.DB2_NAME}`);
     } catch (error) {
       console.error('❌ Erreur de connexion à la base de données:', error);
+      // Nettoyer les pools en cas d'erreur
+      if (this.pool) {
+        await this.pool.end().catch(() => {});
+        this.pool = null;
+      }
+      if (this.pool2) {
+        await this.pool2.end().catch(() => {});
+        this.pool2 = null;
+      }
       throw error;
     }
   }

@@ -11,10 +11,10 @@ import dashboardRoutes from './routes/dashboard';
 import { dbService } from './services/database';
 
 // Load environment variables from root directory
-dotenv.config({ path: '../../.env' });
+dotenv.config({ path: path.join(__dirname, '../../../.env') });
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = parseInt(process.env.PORT || '3001', 10);
 
 // Middleware
 app.use(helmet());
@@ -67,15 +67,14 @@ app.use('/api/*', (req, res) => {
   });
 });
 
-app.listen(PORT, async () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Serveur démarré sur le port ${PORT}`);
-  console.log(`📊 API Dashboard disponible sur http://localhost:${PORT}`);
+  console.log(`📊 API Dashboard disponible sur http://0.0.0.0:${PORT}`);
   
-  // Tentative de connexion à la base de données
-  try {
-    await dbService.connect();
-  } catch (error) {
+  // Tentative de connexion à la base de données en arrière-plan (non-bloquante)
+  dbService.connect().catch(error => {
     console.warn('⚠️ Impossible de se connecter à la base de données, utilisation des données mockées');
     console.warn('💡 Configurez les variables DB_* dans votre fichier .env pour utiliser MySQL');
-  }
+    console.error('Détails de l\'erreur DB:', error.message);
+  });
 });
