@@ -11,7 +11,7 @@ import { dashboardApi } from '@/lib/api';
 
 const Dashboard: React.FC = () => {
   // Récupérer les statistiques depuis l'API
-  const { data: statsData, isLoading: statsLoading } = useQuery({
+  const { data: statsData } = useQuery({
     queryKey: ['dashboard-stats'],
     queryFn: dashboardApi.getStats,
   });

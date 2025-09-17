@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
+import path from 'path';
 
 // Import routes
 import authRoutes from './routes/auth';
@@ -24,7 +25,7 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Routes
+// Routes API
 app.use('/api/auth', authRoutes);
 app.use('/api/clients', clientsRoutes);
 app.use('/api/dashboard', dashboardRoutes);
@@ -38,6 +39,17 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Servir les fichiers statiques du frontend en production
+if (process.env.NODE_ENV === 'production') {
+  const frontendDistPath = path.join(__dirname, '../../frontend/dist');
+  app.use(express.static(frontendDistPath));
+  
+  // Catch-all handler: renvoie index.html pour toutes les routes non-API
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(frontendDistPath, 'index.html'));
+  });
+}
+
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error('Erreur:', err);
@@ -47,11 +59,11 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   });
 });
 
-// 404 handler
-app.use('*', (req, res) => {
+// 404 handler pour les routes API uniquement (en développement)
+app.use('/api/*', (req, res) => {
   res.status(404).json({
     success: false,
-    error: 'Route non trouvée'
+    error: 'Route API non trouvée'
   });
 });
 

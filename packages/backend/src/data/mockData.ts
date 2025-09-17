@@ -12,7 +12,8 @@ export const mockClients: Client[] = [
     factures_count: 45,
     contacts_count: 8,
     entreprises_count: 3,
-    factures_fournisseurs_count: 12
+    factures_fournisseurs_count: 12,
+    has_legal_unit: true
   },
   {
     id: '2',
@@ -25,7 +26,8 @@ export const mockClients: Client[] = [
     factures_count: 32,
     contacts_count: 5,
     entreprises_count: 2,
-    factures_fournisseurs_count: 8
+    factures_fournisseurs_count: 8,
+    has_legal_unit: true
   },
   {
     id: '3',
@@ -38,7 +40,8 @@ export const mockClients: Client[] = [
     factures_count: 78,
     contacts_count: 12,
     entreprises_count: 1,
-    factures_fournisseurs_count: 25
+    factures_fournisseurs_count: 25,
+    has_legal_unit: false
   },
   {
     id: '4',
@@ -51,7 +54,8 @@ export const mockClients: Client[] = [
     factures_count: 156,
     contacts_count: 20,
     entreprises_count: 7,
-    factures_fournisseurs_count: 43
+    factures_fournisseurs_count: 43,
+    has_legal_unit: true
   },
   {
     id: '5',
@@ -64,7 +68,8 @@ export const mockClients: Client[] = [
     factures_count: 89,
     contacts_count: 15,
     entreprises_count: 4,
-    factures_fournisseurs_count: 18
+    factures_fournisseurs_count: 18,
+    has_legal_unit: true
   },
   {
     id: '6',
@@ -77,7 +82,8 @@ export const mockClients: Client[] = [
     factures_count: 234,
     contacts_count: 28,
     entreprises_count: 6,
-    factures_fournisseurs_count: 67
+    factures_fournisseurs_count: 67,
+    has_legal_unit: true
   },
   {
     id: '7',
@@ -90,7 +96,8 @@ export const mockClients: Client[] = [
     factures_count: 67,
     contacts_count: 9,
     entreprises_count: 3,
-    factures_fournisseurs_count: 15
+    factures_fournisseurs_count: 15,
+    has_legal_unit: false
   },
   {
     id: '8',
@@ -103,7 +110,8 @@ export const mockClients: Client[] = [
     factures_count: 123,
     contacts_count: 18,
     entreprises_count: 5,
-    factures_fournisseurs_count: 34
+    factures_fournisseurs_count: 34,
+    has_legal_unit: true
   },
   {
     id: '9',
@@ -116,7 +124,8 @@ export const mockClients: Client[] = [
     factures_count: 45,
     contacts_count: 7,
     entreprises_count: 2,
-    factures_fournisseurs_count: 9
+    factures_fournisseurs_count: 9,
+    has_legal_unit: false
   },
   {
     id: '10',
@@ -129,7 +138,8 @@ export const mockClients: Client[] = [
     factures_count: 198,
     contacts_count: 25,
     entreprises_count: 8,
-    factures_fournisseurs_count: 52
+    factures_fournisseurs_count: 52,
+    has_legal_unit: true
   },
   {
     id: '11',
@@ -142,7 +152,8 @@ export const mockClients: Client[] = [
     factures_count: 76,
     contacts_count: 11,
     entreprises_count: 3,
-    factures_fournisseurs_count: 19
+    factures_fournisseurs_count: 19,
+    has_legal_unit: true
   },
   {
     id: '12',
@@ -155,7 +166,8 @@ export const mockClients: Client[] = [
     factures_count: 312,
     contacts_count: 45,
     entreprises_count: 12,
-    factures_fournisseurs_count: 89
+    factures_fournisseurs_count: 89,
+    has_legal_unit: true
   },
   {
     id: '13',
@@ -168,7 +180,8 @@ export const mockClients: Client[] = [
     factures_count: 89,
     contacts_count: 14,
     entreprises_count: 4,
-    factures_fournisseurs_count: 23
+    factures_fournisseurs_count: 23,
+    has_legal_unit: false
   },
   {
     id: '14',
@@ -181,7 +194,8 @@ export const mockClients: Client[] = [
     factures_count: 34,
     contacts_count: 6,
     entreprises_count: 2,
-    factures_fournisseurs_count: 7
+    factures_fournisseurs_count: 7,
+    has_legal_unit: false
   },
   {
     id: '15',
@@ -194,7 +208,8 @@ export const mockClients: Client[] = [
     factures_count: 56,
     contacts_count: 8,
     entreprises_count: 3,
-    factures_fournisseurs_count: 12
+    factures_fournisseurs_count: 12,
+    has_legal_unit: true
   },
   {
     id: '16',
@@ -207,7 +222,8 @@ export const mockClients: Client[] = [
     factures_count: 145,
     contacts_count: 22,
     entreprises_count: 6,
-    factures_fournisseurs_count: 38
+    factures_fournisseurs_count: 38,
+    has_legal_unit: true
   },
   {
     id: '17',
@@ -220,7 +236,8 @@ export const mockClients: Client[] = [
     factures_count: 67,
     contacts_count: 10,
     entreprises_count: 3,
-    factures_fournisseurs_count: 16
+    factures_fournisseurs_count: 16,
+    has_legal_unit: false
   },
   {
     id: '18',
@@ -233,7 +250,8 @@ export const mockClients: Client[] = [
     factures_count: 78,
     contacts_count: 12,
     entreprises_count: 4,
-    factures_fournisseurs_count: 20
+    factures_fournisseurs_count: 20,
+    has_legal_unit: true
   },
   {
     id: '19',
@@ -246,7 +264,8 @@ export const mockClients: Client[] = [
     factures_count: 92,
     contacts_count: 16,
     entreprises_count: 5,
-    factures_fournisseurs_count: 24
+    factures_fournisseurs_count: 24,
+    has_legal_unit: true
   },
   {
     id: '20',
@@ -259,7 +278,8 @@ export const mockClients: Client[] = [
     factures_count: 187,
     contacts_count: 29,
     entreprises_count: 9,
-    factures_fournisseurs_count: 48
+    factures_fournisseurs_count: 48,
+    has_legal_unit: true
   }
 ];
 
