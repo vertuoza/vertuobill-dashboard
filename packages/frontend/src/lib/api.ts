@@ -1,7 +1,11 @@
 import axios from 'axios';
 import { LoginRequest, AuthResponse, ApiResponse, PaginatedResponse, Client, PaginationParams } from '@dashboard/shared';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+// En production, utiliser des URLs relatives (même domaine)
+// En développement, utiliser localhost
+const API_BASE_URL = import.meta.env.PROD 
+  ? '/api'  // URLs relatives en production
+  : (import.meta.env.VITE_API_URL || 'http://localhost:3001/api');
 
 // Create axios instance
 const api = axios.create({
