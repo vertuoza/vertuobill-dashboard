@@ -206,7 +206,8 @@ const ClientsTable: React.FC = () => {
 
         {/* Table */}
         <div className="bg-white shadow overflow-hidden sm:rounded-md">
-          <table className="min-w-full divide-y divide-gray-200">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
                 <th 
@@ -332,10 +333,11 @@ const ClientsTable: React.FC = () => {
               </tr>
             ))}
           </tbody>
-        </table>
-      </div>
+            </table>
+          </div>
+        </div>
 
-      {/* Pagination */}
+        {/* Pagination */}
       {pagination && (
         <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
           <div className="flex-1 flex justify-between sm:hidden">
