@@ -385,9 +385,9 @@ export class DatabaseService {
         societes.map(async (societe) => {
           const societeId = societe.societe_id;
 
-          // Récupérer le contact principal
+          // Récupérer le contact principal avec login
           const [contactRows] = await this.pool!.execute(
-            'SELECT u.user_pname, u.user_name, u.user_phone FROM user u WHERE u.user_societe_id = ? AND u.user_compte = 1 AND u.user_type = 1 AND u.user_valid = 1 LIMIT 1',
+            'SELECT u.user_pname, u.user_name, u.user_phone, u.user_login FROM user u WHERE u.user_societe_id = ? AND u.user_compte = 1 AND u.user_type = 1 AND u.user_valid = 1 LIMIT 1',
             [societeId]
           );
           const contact = (contactRows as any[])[0];
@@ -416,27 +416,38 @@ export class DatabaseService {
           // Vérifier l'existence dans legal_unit (utiliser societeId comme tenant_id)
           const hasLegalUnit = await this.checkLegalUnitExists(societeId.toString());
 
-          // Formater l'adresse avec les champs séparés
-          const addressParts = [
-            societe.adresse_rue,
-            societe.adresse_numero,
-            societe.adresse_cp,
-            societe.adresse_pays
-          ].filter(part => part && part.trim()).join(' ');
+          // Formater l'adresse correctement (rue + numéro, code postal, pays)
+          const addressParts = [];
+          if (societe.adresse_rue && societe.adresse_numero) {
+            addressParts.push(`${societe.adresse_rue} ${societe.adresse_numero}`);
+          } else if (societe.adresse_rue) {
+            addressParts.push(societe.adresse_rue);
+          }
+          if (societe.adresse_cp) {
+            addressParts.push(societe.adresse_cp);
+          }
+          if (societe.adresse_pays) {
+            addressParts.push(societe.adresse_pays);
+          }
+          const address = addressParts.filter(part => part && part.trim()).join(' ');
 
           return {
             id: societeId.toString(),
             societe_name: societe.societe_name,
             email: contact?.user_pname || contact?.user_name || '',
             phone: contact?.user_phone || '',
-            address: addressParts,
+            address: address,
             created_at: societe.societe_datecrea,
             updated_at: societe.societe_datecrea,
             factures_count: (facturesCount as any[])[0].count,
             contacts_count: (contactsCount as any[])[0].count,
             entreprises_count: (entreprisesCount as any[])[0].count,
             factures_fournisseurs_count: (facturesFournisseursCount as any[])[0].count,
-            has_legal_unit: hasLegalUnit
+            has_legal_unit: hasLegalUnit,
+            // Informations utilisateur
+            user_pname: contact?.user_pname || '',
+            user_name: contact?.user_name || '',
+            user_login: contact?.user_login || ''
           };
         })
       );

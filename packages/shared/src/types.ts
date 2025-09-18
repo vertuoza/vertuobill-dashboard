@@ -29,6 +29,10 @@ export interface Client {
   factures_fournisseurs_count: number;
   // Legal unit status
   has_legal_unit: boolean;
+  // Informations utilisateur
+  user_pname?: string;
+  user_name?: string;
+  user_login?: string;
 }
 
 export interface PaginationParams {

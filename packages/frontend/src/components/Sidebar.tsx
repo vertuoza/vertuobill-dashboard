@@ -22,9 +22,9 @@ const Sidebar: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col w-64 bg-white shadow-lg">
+    <div className="flex flex-col w-64 bg-slate-800 shadow-lg">
       {/* Logo */}
-      <div className="flex items-center justify-center h-16 px-4 bg-slate-800">
+      <div className="flex items-center justify-center h-16 px-4 bg-slate-900">
         <div className="flex items-center space-x-3">
           <img 
             src="/logo.png" 
@@ -48,8 +48,8 @@ const Sidebar: React.FC = () => {
             className={({ isActive }) =>
               `group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
                 isActive
-                  ? 'bg-primary-100 text-primary-900 border-r-2 border-primary-600'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  ? 'bg-slate-700 text-white border-r-2 border-white'
+                  : 'text-white hover:bg-slate-700 hover:text-white'
               }`
             }
           >
@@ -63,10 +63,10 @@ const Sidebar: React.FC = () => {
       </nav>
 
       {/* Logout */}
-      <div className="px-4 py-4 border-t border-gray-200">
+      <div className="px-4 py-4 border-t border-slate-600">
         <button
           onClick={handleLogout}
-          className="group flex items-center w-full px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-red-50 hover:text-red-700 transition-colors duration-200"
+          className="group flex items-center w-full px-2 py-2 text-sm font-medium text-white rounded-md hover:bg-red-600 hover:text-white transition-colors duration-200"
         >
           <ArrowRightOnRectangleIcon className="mr-3 h-5 w-5 flex-shrink-0" aria-hidden="true" />
           Déconnexion

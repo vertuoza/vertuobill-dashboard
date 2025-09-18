@@ -134,54 +134,54 @@ const ClientsTable: React.FC = () => {
 
   return (
     <div className="space-y-4">
-      {/* Filters */}
-      <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-        <div className="space-y-4">
-          {/* Date Filters */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="relative">
-              <label className="block text-xs font-medium text-gray-700 mb-1">Date de début</label>
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" style={{top: '20px'}}>
-                <CalendarIcon className="h-4 w-4 text-gray-400" />
+        {/* Filters */}
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+          <div className="space-y-4">
+            {/* Date Filters */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="relative">
+                <label className="block text-xs font-medium text-gray-700 mb-1">Date de début</label>
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" style={{top: '20px'}}>
+                  <CalendarIcon className="h-4 w-4 text-gray-400" />
+                </div>
+                <input
+                  type="date"
+                  className="block w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
+                  value={dateFrom}
+                  onChange={handleDateFromChange}
+                />
               </div>
-              <input
-                type="date"
-                className="block w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
-                value={dateFrom}
-                onChange={handleDateFromChange}
-              />
-            </div>
 
-            <div className="relative">
-              <label className="block text-xs font-medium text-gray-700 mb-1">Date de fin</label>
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" style={{top: '20px'}}>
-                <CalendarIcon className="h-4 w-4 text-gray-400" />
+              <div className="relative">
+                <label className="block text-xs font-medium text-gray-700 mb-1">Date de fin</label>
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" style={{top: '20px'}}>
+                  <CalendarIcon className="h-4 w-4 text-gray-400" />
+                </div>
+                <input
+                  type="date"
+                  className="block w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
+                  value={dateTo}
+                  onChange={handleDateToChange}
+                />
               </div>
-              <input
-                type="date"
-                className="block w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
-                value={dateTo}
-                onChange={handleDateToChange}
-              />
-            </div>
 
-            <div className="flex items-end space-x-2">
-              <button
-                onClick={applyFilters}
-                className="px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
-              >
-                Filtrer
-              </button>
-              {(searchInput || dateFrom || dateTo) && (
+              <div className="flex items-end space-x-2">
                 <button
-                  onClick={clearFilters}
-                  className="px-3 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition-colors"
-                  title="Effacer les filtres"
+                  onClick={applyFilters}
+                  className="px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
                 >
-                  Effacer
+                  Filtrer
                 </button>
-              )}
-            </div>
+                {(searchInput || dateFrom || dateTo) && (
+                  <button
+                    onClick={clearFilters}
+                    className="px-3 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition-colors"
+                    title="Effacer les filtres"
+                  >
+                    Effacer
+                  </button>
+                )}
+              </div>
           </div>
 
           {/* Search - Taille réduite */}
@@ -201,24 +201,24 @@ const ClientsTable: React.FC = () => {
               />
             </div>
           </div>
+          </div>
         </div>
-      </div>
 
-      {/* Table */}
-      <div className="bg-white shadow overflow-hidden sm:rounded-md">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th 
-                className="table-header cursor-pointer hover:bg-gray-100"
-                onClick={() => handleSort('societe_name')}
-              >
-                <div className="flex items-center space-x-1">
-                  <span>Société</span>
-                  {getSortIcon('societe_name')}
-                </div>
-              </th>
-              <th className="table-header">Contact</th>
+        {/* Table */}
+        <div className="bg-white shadow overflow-hidden sm:rounded-md">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th 
+                  className="table-header cursor-pointer hover:bg-gray-100"
+                  onClick={() => handleSort('societe_name')}
+                >
+                  <div className="flex items-center space-x-1">
+                    <span>Société</span>
+                    {getSortIcon('societe_name')}
+                  </div>
+                </th>
+              <th className="table-header">Utilisateur</th>
               <th className="table-header">Electronic invoicing</th>
               <th 
                 className="table-header cursor-pointer hover:bg-gray-100"
@@ -284,11 +284,16 @@ const ClientsTable: React.FC = () => {
                 </td>
                 <td className="table-cell">
                   <div>
-                    {client.email && (
-                      <div className="text-sm text-gray-900">{client.email}</div>
+                    {(client.user_pname || client.user_name) && (
+                      <div className="text-sm text-gray-900">
+                        {client.user_pname} {client.user_name}
+                      </div>
                     )}
                     {client.phone && (
                       <div className="text-sm text-gray-500">{client.phone}</div>
+                    )}
+                    {client.user_login && (
+                      <div className="text-sm text-gray-500">{client.user_login}</div>
                     )}
                   </div>
                 </td>
@@ -420,7 +425,7 @@ const ClientsTable: React.FC = () => {
             </div>
           </div>
         </div>
-      )}
+        )}
     </div>
   );
 };
